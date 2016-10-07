@@ -34,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        SongAdapter songadpt = new SongAdapter(this,songlist);
+        songview.setAdapter(songadpt);
+
     }
     public void getSongList(){
         ContentResolver musicResolver = getContentResolver();
