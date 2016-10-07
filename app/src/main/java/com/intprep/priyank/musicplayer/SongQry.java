@@ -29,7 +29,5 @@ public class SongQry {
     public String getArtist(){
         return artist;
     }
-    public String getAlbum(){
-        return album;
-    }
+    public String getAlbum() {  return album;  }
 }
