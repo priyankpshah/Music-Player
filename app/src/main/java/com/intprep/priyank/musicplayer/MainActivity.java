@@ -1,6 +1,7 @@
 package com.intprep.priyank.musicplayer;
 
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -14,9 +15,14 @@ import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
+    //Variable to store songlist and store it into model class.
     private ArrayList<SongQry> songlist;
     private ListView songview;
+
+    //Variable For using Service
+    private MusicService musicServc;
+    private Intent playintent;
+    private boolean musicbound = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
