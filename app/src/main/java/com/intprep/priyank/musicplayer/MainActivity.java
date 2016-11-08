@@ -1,12 +1,19 @@
 package com.intprep.priyank.musicplayer;
 
+import android.content.ComponentName;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.IBinder;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -64,5 +71,52 @@ public class MainActivity extends AppCompatActivity {
             }while(musicCur.moveToNext());
         }
     }
+    private ServiceConnection musicConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            MusicService.MusicBinder binder = (MusicService.MusicBinder)service;
 
+            musicServc = binder.getService();
+            musicServc.setList(songlist);
+            musicbound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            musicbound = false;
+        }
+    };
+    @Override
+    protected void onStart(){
+        super.onStart();
+        if(playintent==null){
+            playintent = new Intent(this,MusicService.class);
+            bindService(playintent,musicConnection, Context.BIND_AUTO_CREATE);
+            startService(playintent);
+        }
+    }
+
+    public void songPicked(View view){
+        musicServc.setSong(Integer.parseInt(view.getTag().toString()));
+        musicServc.playSong();
+    }
+
+    public boolean onOptionItemSelected(MenuItem item){
+        switch (item.getItemId()){
+            case R.id.shuffle:
+                break;
+            case R.id.action_stop:
+                stopService(playintent);
+                musicServc=null;
+                System.exit(0);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    @Override
+    protected void onDestroy(){
+        stopService(playintent);
+        musicServc = null ;
+        super.onDestroy();
+    }
 }

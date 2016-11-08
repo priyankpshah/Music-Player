@@ -1,15 +1,17 @@
 package com.intprep.priyank.musicplayer;
 
 import android.app.Service;
+import android.content.ContentUris;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.MediaPlayer.TrackInfo;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-
+import android.util.Log;
 import java.util.ArrayList;
 
 /**
@@ -21,7 +23,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     private ArrayList<SongQry> songs;
     private int songPos;
 
-    public void create(){
+    private final IBinder musicBind = new MusicBinder();
+
+    public void onCreate(){
         super.onCreate();
         songPos = 0;
         mPlayer = new MediaPlayer();
@@ -48,7 +52,13 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return musicBind;
+    }
+
+    public boolean onUnbind(Intent intent){
+       mPlayer.stop();
+        mPlayer.release();
+        return false;
     }
 
     @Override
@@ -63,6 +73,24 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     @Override
     public void onPrepared(MediaPlayer mediaPlayer) {
+        mediaPlayer.start();
+    }
 
+    public void playSong(){
+        mPlayer.reset();
+        SongQry playSong = songs.get(songPos);
+        long currSong = playSong.getId();
+        Uri trackUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,currSong);
+
+        try{
+          mPlayer.setDataSource(getApplicationContext(), trackUri);
+        } catch (Exception e) {
+            Log.e("MUSIC SERVICE","Error settin Data Source",e);
+        }
+        mPlayer.prepareAsync();
+    }
+
+    public void setSong(int songIndex){
+        songPos = songIndex;
     }
 }
