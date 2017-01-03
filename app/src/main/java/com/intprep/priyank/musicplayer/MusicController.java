@@ -1,6 +1,7 @@
 package com.intprep.priyank.musicplayer;
 
 import android.content.Context;
+import android.view.View;
 import android.widget.MediaController;
 
 /**
@@ -14,6 +15,11 @@ public class MusicController extends MediaController {
     }
 
     public void hide(){
+
+    }
+
+
+    public void setPrevNextListeners(OnClickListener onClickListener) {
 
     }
 }
